@@ -1,6 +1,11 @@
 package com.epam.izh.rd.online.service;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class SimpleTextService implements TextService {
+
+    public static final String MESSAGE_NULL_POINTER = "Null pointer exception, param or params are null";
 
     /**
      * Реализовать функционал удаления строки из другой строки.
@@ -13,7 +18,13 @@ public class SimpleTextService implements TextService {
      */
     @Override
     public String removeString(String base, String remove) {
-        return null; //TODO
+        String resultRemove = base;
+        try {
+            resultRemove = base.replace(remove, "");
+        } catch (NullPointerException e) {
+            System.out.println(SimpleTextService.MESSAGE_NULL_POINTER);
+        }
+        return resultRemove;
     }
 
     /**
@@ -24,7 +35,23 @@ public class SimpleTextService implements TextService {
      */
     @Override
     public boolean isQuestionString(String text) {
-        return false; //TODO
+        if (text != null) {
+            String regExQuestionMark = "(.*)(\\?$)";
+            Pattern patternQestionMark = Pattern.compile(regExQuestionMark);
+            Matcher matcherQestionMark = patternQestionMark.matcher(text);
+            StringBuilder builder = new StringBuilder(text);
+            if (matcherQestionMark.find()) {
+                return builder.substring(matcherQestionMark.start(2), matcherQestionMark.end(2)).contains("?");
+            } else return false;
+        } else {
+            try {
+                throw new Exception();
+            } catch (Exception e) {
+                System.out.println(SimpleTextService.MESSAGE_NULL_POINTER);
+                return false;
+            }
+        }
+
     }
 
     /**
@@ -35,7 +62,11 @@ public class SimpleTextService implements TextService {
      */
     @Override
     public String concatenate(String... elements) {
-        return null; //TODO
+        String resultConcatenate = "";
+        for (String result : elements) {
+            resultConcatenate += result;
+        }
+        return resultConcatenate;
     }
 
     /**
@@ -47,7 +78,22 @@ public class SimpleTextService implements TextService {
      */
     @Override
     public String toJumpCase(String text) {
-        return null; //TODO
+        StringBuilder builderJumpCase = new StringBuilder();
+        char[] charsJumpCase = new char[0];
+        try {
+            charsJumpCase = text.toCharArray();
+        } catch (NullPointerException e) {
+            System.out.println(SimpleTextService.MESSAGE_NULL_POINTER);
+        }
+        if (charsJumpCase.length > 0) {
+            builderJumpCase.append(Character.toLowerCase(charsJumpCase[0]));
+            for (int i = 1; i < charsJumpCase.length; i++) {
+                if (i % 2 == 0) {
+                    builderJumpCase.append(Character.toLowerCase(charsJumpCase[i]));
+                } else builderJumpCase.append(Character.toUpperCase(charsJumpCase[i]));
+            }
+        }
+        return builderJumpCase.toString();
     }
 
     /**
@@ -59,6 +105,19 @@ public class SimpleTextService implements TextService {
      */
     @Override
     public boolean isPalindrome(String string) {
-       return false; //TODO
+       char[] palindromeChars = new char[0];
+       boolean isEqualsChars = true;
+        try {
+            palindromeChars = string.replaceAll("[\\s]{1,}", "").toCharArray();
+        } catch (NullPointerException e) {
+            System.out.println(SimpleTextService.MESSAGE_NULL_POINTER);
+            isEqualsChars = false;
+        }
+       for (int i = 0, j = palindromeChars.length - 1; i < j && isEqualsChars; i++, j--) {
+           if (Character.toLowerCase(palindromeChars[i]) != Character.toLowerCase(palindromeChars[j])) {
+               isEqualsChars = false;
+           }
+       }
+       return palindromeChars.length != 0 && isEqualsChars;
     }
 }

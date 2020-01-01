@@ -3,8 +3,14 @@ package com.epam.izh.rd.online.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SimpleDateService implements DateService {
+
+    public static final String MESSAGE_WRONG_DATE_FORMAT = "Wrong date format. Needed yyyy-mm-dd hh:mm";
+
+    public static final String MESSAGE_WRONG_DATE_FORMATTER =  "Formatter is null, will be returned ";
 
     /**
      * Метод парсит дату в строку
@@ -14,7 +20,8 @@ public class SimpleDateService implements DateService {
      */
     @Override
     public String parseDate(LocalDate localDate) {
-        return null;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-YYYY");
+        return formatter.format(localDate);
     }
 
     /**
@@ -25,7 +32,17 @@ public class SimpleDateService implements DateService {
      */
     @Override
     public LocalDateTime parseString(String string) {
-        return null;
+        Pattern pattern = Pattern.compile("^([01][0-9][0-9][0-9]|[2][0][01][0-9])\\-(0?[1-9]|1[012])\\-(0?[1-9]|[12][0-9]|3[01])\\s([01][0-9]|2[0-3])\\:([0-5][0-9])$");
+        Matcher matcher = pattern.matcher(string);
+        LocalDateTime dateTime;
+        if (matcher.find()) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            dateTime = LocalDateTime.parse(string, formatter);
+        } else {
+            System.out.println(SimpleDateService.MESSAGE_WRONG_DATE_FORMAT);
+            dateTime = null;
+        }
+        return  dateTime;
     }
 
     /**
@@ -37,7 +54,12 @@ public class SimpleDateService implements DateService {
      */
     @Override
     public String convertToCustomFormat(LocalDate localDate, DateTimeFormatter formatter) {
-        return null;
+        try {
+            return formatter.format(localDate);
+        } catch (NullPointerException e) {
+            System.out.println(SimpleDateService.MESSAGE_WRONG_DATE_FORMATTER + e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -47,7 +69,19 @@ public class SimpleDateService implements DateService {
      */
     @Override
     public long getNextLeapYear() {
-        return 0;
+        long year = LocalDate.now().getYear();
+        year++;
+        boolean flagIsLeapYear = false;
+        while (!flagIsLeapYear) {
+            if (year % 100 == 0) {
+                if (year % 400 == 0) {
+                    flagIsLeapYear = true;
+                } else year++;
+            } else if (year % 4 == 0) {
+                flagIsLeapYear = true;
+            } else year++;
+        }
+        return year;
     }
 
     /**
@@ -57,7 +91,8 @@ public class SimpleDateService implements DateService {
      */
     @Override
     public long getSecondsInYear(int year) {
-        return 0;
+        long lengthOfYear = LocalDate.of(year,1,1).lengthOfYear();
+        return lengthOfYear * 86400;
     }
 
 
